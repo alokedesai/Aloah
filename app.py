@@ -17,15 +17,7 @@ def upload_file():
         	file_location = os.path.abspath(file.filename)
         	blob_service.put_block_blob_from_file('testcontainer',file.filename,file, x_ms_blob_content_type=file.content_type)
         	return redirect(url_for('list'))
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form action="" method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
-    </form>
-    '''
+    return render_template("index.html")
 @app.route("/list")
 def list():
 	blobs = blob_service.list_blobs('testcontainer')
@@ -41,6 +33,11 @@ def download(filename):
 
 	return response
 
+@app.route("/delete/<filename>")
+def delete(filename):
+	blob_service.delete_blob('testcontainer', filename) 
+
+	return redirect(url_for("upload_file"))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,17 +1,21 @@
 <html>
 <head>
-	<title>All the Files</title>
+	<title>Your Files</title>
+	 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}">
 </head>
 <body>
-	Your Files:
-	<table>
+	<h1>Your Files:</h1>
+	<table class="table table-striped table-hover">
 		<tr>
-			<td>
+			<th>
 				File Name	
-			</td>
-			<td>
-				File URL
-			</td>
+			</th>
+			<th>
+				Download
+			</th>
+			<th>
+				Delete
+			</th>
 		</tr>
 		{% for blob in blobs %}
 		<tr>
@@ -19,12 +23,13 @@
 				{{ blob.name }}
 			</td>
 			<td>
-				{{ blob.url }}
+				<a class="btn btn-primary" href="/download/{{blob.name}}">Download</a>
 			</td>
 
 			<td>
-				<a href="/download/{{blob.name}}">Download</a>
+				<a class="btn btn-danger" href="/delete/{{blob.name}}">Delete</a>
 			</td>
+
 		</tr>
 		{% endfor %}
 	</table>	
