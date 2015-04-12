@@ -2,8 +2,25 @@
 <html>
 <head>
     <title>Aloah</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}">
 </head>
 <body>
-  Hello World
+	<h1 class="type">Welcome to Aloah</h1>
+    <form action"" method="post" enctype="multipart/form-data" class="form-horizontal">
+	    <fieldset>
+	      <legend>Upload a new file</legend>
+	      <div class="form-group">
+	        <label for="inputFile" class="col-lg-2 control-label">File</label>
+	        <div class="col-lg-10">
+	          <input type="file" class="form-control" id="file" name="file" placeholder="File">
+	        </div>
+	      </div>
+	      <div class="form-group">
+	        <div class="col-lg-10 col-lg-offset-2">
+	          <button type="submit" class="btn btn-primary">Upload</button>
+	        </div>
+	      </div>
+    </fieldset>
+	</form>
 </body>
 </html>
