@@ -1,8 +1,8 @@
 from Crypto.Cipher import AES
 from Crypto import Random
 from Crypto.Hash import SHA256
-import base64
 import sys
+import os
 
 #Adds any extra required space to the message
 #May need to change this since it only adds \0
@@ -10,53 +10,72 @@ def pad(s):
     return s + b"\0" * (AES.block_size - len(s) % AES.block_size)
 
 
-def encrypt_file(file_name, key):
-	with open(file_name, 'rb') as fo:
-		plaintext = fo.read()
+def encrypt_file(filename, key):
 
+	contentsize = 64*1024
+	filesize = os.path.getsize(filename)
 
 	inhash = SHA256.new()
-	inhash.update(open(file_name).read())
+	inhash.update(open(filename).read())
 	inhash = inhash.digest()
 
-
-	message = pad(plaintext)
 	iv = Random.new().read(AES.block_size)
 	cipher = AES.new(key, AES.MODE_CBC, iv)
-	enc =  iv + inhash + cipher.encrypt(message)
+	#enc =  iv + inhash + cipher.encrypt(message)
+	outfilename = filename + ".enc"
 
-	with open(file_name + ".enc", 'wb') as fo:
-		fo.write(enc)
+	with open(outfilename, 'wb') as outfile:
+		outfile.write(str(filesize).zfill(16))
+		outfile.write(iv)
+		outfile.write(inhash)
 
-def decrypt_file(file_name, key):
+		with open(filename, 'rb') as infile:
+			while True:
+				content = infile.read(contentsize)
+				if len(content) == 0:   
+					break  # End of content.
+				elif (len(content) % 16) != 0:
+					content = pad(content) # Content requires padding.
+				outfile.write(cipher.encrypt(content))
+		infile.close()
+	outfile.close()
+
+def decrypt_file(filename, key):
+	contentsize = 64*1024
+
+	outfilename = "decrypted_" + filename[:-4]
+
+	with open(filename, 'rb') as infile:
+	    filesize = long(infile.read(16))
+	    iv = infile.read(16)
+	    inhash = infile.read(32)
 
 
-	with open(file_name, 'rb') as fo:
-		ciphertext = fo.read()
+	    cipher = AES.new(key, AES.MODE_CBC, iv)
 
-	iv = ciphertext[:AES.block_size]
-	#The +32 is because the hash is 256 = 32 bytes
-	inhash = ciphertext[AES.block_size:(AES.block_size+32)]
-	cipher = AES.new(key, AES.MODE_CBC, iv)
-	plaintext = cipher.decrypt(ciphertext[(AES.block_size+32):])
-	dec =  plaintext.rstrip(b"\0")
+	    with open(outfilename, 'wb') as outfile:
+	        while True:
+	            content = infile.read(contentsize)
 
-	outfile = "decrypted_" + file_name[:-4]
+	            if len(content) == 0:
+	                # End of content.
+	                break
 
-	with open(outfile, 'wb') as fo:
-		fo.write(dec)
+	            outfile.write(cipher.decrypt(content))
+	        outfile.truncate(filesize)
+	    outfile.close()
+	infile.close()
 
 	outhash = SHA256.new()
-	outhash.update(open(outfile).read())
+	with open(outfilename, 'rb') as outfile:
+		outhash.update(outfile.read())
+	outfile.close()
 	outhash = outhash.digest()
 
 	if inhash == outhash:
 		print "Integrity check passed"
 	else:
 		print "Integrity check failed"
-
-
-
 
 key = b'\xbf\xc0\x85)\x10nc\x94\x02)j\xdf\xcb\xc4\x94\x9d(\x9e[EX\xc8\xd5\xbfI{\xa2$\x05(\xd5\x18'
 
