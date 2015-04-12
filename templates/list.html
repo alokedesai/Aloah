@@ -1,0 +1,33 @@
+<html>
+<head>
+	<title>All the Files</title>
+</head>
+<body>
+	Your Files:
+	<table>
+		<tr>
+			<td>
+				File Name	
+			</td>
+			<td>
+				File URL
+			</td>
+		</tr>
+		{% for blob in blobs %}
+		<tr>
+			<td>
+				{{ blob.name }}
+			</td>
+			<td>
+				{{ blob.url }}
+			</td>
+
+			<td>
+				<a href="/download/{{blob.name}}">Download</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>	
+	
+</body>
+</html>

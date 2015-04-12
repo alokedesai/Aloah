@@ -15,8 +15,8 @@ def upload_file():
         file = request.files['file']
         if file:
         	file_location = os.path.abspath(file.filename)
-        	blob_service.put_block_blob_from_file('testcontainer','aloah',file, x_ms_blob_content_type=file.content_type)
-        	return redirect(url_for('test'))
+        	blob_service.put_block_blob_from_file('testcontainer',file.filename,file, x_ms_blob_content_type=file.content_type)
+        	return redirect(url_for('list'))
     return '''
     <!doctype html>
     <title>Upload new File</title>
@@ -26,8 +26,26 @@ def upload_file():
          <input type=submit value=Upload>
     </form>
     '''
-@app.route("/test")
-def test():
-	return "it worked!"
+@app.route("/list")
+def list():
+	blobs = blob_service.list_blobs('testcontainer')
+
+	return render_template("list.html", blobs = blobs)
+
+@app.route("/download/<filename>")
+def download(filename):
+	file_output = blob_service.get_blob('testcontainer', filename)
+    # This is the key: Set the right header for the response
+    # to be downloaded, instead of just printed on the browser
+    # response.headers["Content-Disposition"] = "attachment; filename=" + filename
+    
+    # headers = {"Content-Disposition": "attachment; filename=%s" % filename}
+    # with open(file_output, 'r') as f:
+    # 	body = f.read()
+    # return make_response((body, headers))
+    return file_output
+	
+
+
 if __name__ == '__main__':
     app.run(debug=True)
