@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title>Your Files</title>
+	 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+</head>
+<body>
+	<h1>Your Files:</h1>
+	<table class="table table-striped table-hover">
+		<tr>
+			<th>
+				File Name	
+			</th>
+			<th>
+				Download
+			</th>
+			<th>
+				Delete
+			</th>
+		</tr>
+		{% for blob in blobs %}
+		<tr>
+			<td>
+				{{ blob.name }}
+			</td>
+			<td>
+				<a class="btn btn-primary" href="/download/{{blob.name}}">Download</a>
+			</td>
+
+			<td>
+				<a class="btn btn-danger" href="/delete/{{blob.name}}">Delete</a>
+			</td>
+
+		</tr>
+		{% endfor %}
+	</table>	
+	
+</body>
+</html>
