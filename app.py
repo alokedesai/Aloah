@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, Response, redirect, url_for, send_file
+from flask import Flask, render_template, request, jsonify, Response, redirect, url_for, send_file, make_response
 from azure.storage import BlobService
 import os
 
@@ -21,16 +21,16 @@ def upload_file():
 @app.route("/list")
 def list():
 	blobs = blob_service.list_blobs('testcontainer')
-
 	return render_template("list.html", blobs = blobs)
 
 @app.route("/download/<filename>")
 def download(filename):
 	temp = open("temp", "w")
-	file_output = blob_service.get_blob_to_file('testcontainer', filename, temp)
-	response = send_file("temp", as_attachment=True, attachment_filename=filename)
-	os.remove("temp")
-
+	file_output = blob_service.get_blob('testcontainer', filename)
+	
+	response = make_response(file_output)
+	attachment_header = "attachment; filename=" + filename
+	response.headers["Content-Disposition"] = attachment_header
 	return response
 
 @app.route("/delete/<filename>")
