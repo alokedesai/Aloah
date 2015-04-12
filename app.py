@@ -1,5 +1,5 @@
 import pdb
-from flask import Flask, render_template, request, jsonify, Response, redirect, url_for
+from flask import Flask, render_template, request, jsonify, Response, redirect, url_for, send_file
 from azure.storage import BlobService
 import os
 
@@ -34,17 +34,12 @@ def list():
 
 @app.route("/download/<filename>")
 def download(filename):
-	file_output = blob_service.get_blob('testcontainer', filename)
-    # This is the key: Set the right header for the response
-    # to be downloaded, instead of just printed on the browser
-    # response.headers["Content-Disposition"] = "attachment; filename=" + filename
-    
-    # headers = {"Content-Disposition": "attachment; filename=%s" % filename}
-    # with open(file_output, 'r') as f:
-    # 	body = f.read()
-    # return make_response((body, headers))
-    return file_output
-	
+	temp = open("temp", "w")
+	file_output = blob_service.get_blob_to_file('testcontainer', filename, temp)
+	response = send_file("temp", as_attachment=True, attachment_filename=filename)
+	os.remove("temp")
+
+	return response
 
 
 if __name__ == '__main__':
