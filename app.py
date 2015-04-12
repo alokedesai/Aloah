@@ -25,9 +25,8 @@ def list():
 
 @app.route("/download/<filename>")
 def download(filename):
-	temp = open("temp", "w")
 	file_output = blob_service.get_blob('testcontainer', filename)
-	
+
 	response = make_response(file_output)
 	attachment_header = "attachment; filename=" + filename
 	response.headers["Content-Disposition"] = attachment_header
