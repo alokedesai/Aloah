@@ -1,4 +1,3 @@
-import pdb
 from flask import Flask, render_template, request, jsonify, Response, redirect, url_for, send_file
 from azure.storage import BlobService
 import os
@@ -18,6 +17,7 @@ def upload_file():
         	blob_service.put_block_blob_from_file('testcontainer',file.filename,file, x_ms_blob_content_type=file.content_type)
         	return redirect(url_for('list'))
     return render_template("index.html")
+
 @app.route("/list")
 def list():
 	blobs = blob_service.list_blobs('testcontainer')
